@@ -6,11 +6,14 @@ Module implementing MainWindow.
 pyinstaller -Fw wmian.py打包exe程序
 """
 import random
+import sys
+
 from PySide2.QtCore import QTimer,Slot,QDateTime,QDate
 from PySide2.QtGui import QBrush,QColor
 from PySide2.QtWidgets import QMainWindow,QApplication,QFileDialog,QMessageBox,QTableWidgetItem,QHeaderView,\
-    QPushButton,QAbstractButton,QAbstractItemView
+    QPushButton,QAbstractButton,QAbstractItemView,QDialog
 from Ui_mainw import Ui_MainWindow
+from stacked_demo import Ui_Dialog
 from my_fun import My_DB
 from datetime import datetime
 
@@ -156,18 +159,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     if i == 0:
                         newitem = QTableWidgetItem(str(query.value(0).toString('yyyy/M/d h:mm:ss')))
                         self.table.setItem(j, i, newitem)
-                        new_d = query.value(0).toPython()
-                        if j == 0:
-                            d = new_d
-                        else:
-                            # 两个时间差
-                            s = (new_d-d).seconds
-                            d = new_d
-                            # 时间差大于30分钟
-                            if s > 1800:   
-                                self.bgbruse = newitem.background()
-                                newitem.setBackground(QColor(0,255,0))
-                                # self.table.setItem(j, i, newitem)  # 把数字转换成字符串
                     elif i == 1:
                         newitem = QTableWidgetItem(str(query.value(1)))
                         if query.value(1) >= self.one_high or query.value(1) <= self.one_low:
@@ -184,9 +175,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             self.table.setItem(j, i, newitem)  # 把数字转换成字符串
                         else:
                             self.table.setItem(j, i, newitem)
-                    # print(j,i,query.value(i))
+
                 j += 1
-            # print(self.table.text())
+            self.set_color(self.table.rowCount())
         except BaseException as m:
             # print(m)
             # print(type(m))
@@ -229,11 +220,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     # 插入数据
     @Slot()
     def on_ins_tb_clicked(self):
-        start_date,end_date = self.get_date()
-        q_list = self.conn.ins_tb(start_date, end_date)
-        # for q in q_list:
-        #     while q.next():
-        #         print(q.value(0))
+
+        d = QDialog()
+        aa = Ui_Dialog()
+        aa.setupUi(d)
+        d.exec_()
+
+        # start_date,end_date = self.get_date()
+        # q_list = self.conn.ins_tb(start_date, end_date)
+
 
     # 退出
     @Slot()
@@ -243,6 +238,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.close()
         else:
             self.close()
+
 
     # 设置表格
     def set_table(self):
@@ -376,8 +372,27 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                 f"{start_date}到{end_date}之间的数据{mess}完毕！",
                                 )
 
+    # 设置缺失时间的颜色,count总共的行数
+    def set_color(self,counts):
+
+        for count in range(counts):
+            print(self.table.item(count,0).text())
+            if count == 0:
+                d = self.table.item(0,0).text()
+                d = datetime.strptime(d,'%Y/%m/%d %H:%M:%S')
+            else:
+                # 两个时间差
+                new_d = self.table.item(count,0).text()
+                new_d = datetime.strptime(new_d, '%Y/%m/%d %H:%M:%S')
+                s = (new_d-d).seconds
+                d = new_d
+                # 时间差大于30分钟
+                if s > 1800:
+                    self.table.item(count-1,0).setBackground(QColor(255,0,0))
+                    self.table.item(count,0).setBackground(QColor(0,255,0))
+
+
 def main():
-    import sys
     app = QApplication(sys.argv)
     m = MainWindow()
     m.show()
