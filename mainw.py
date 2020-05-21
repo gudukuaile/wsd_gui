@@ -29,17 +29,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         @param parent reference to the parent widget
         @type QWidget
         """
-        # self.conn = ''   #
-        # print(id(self.conn))
-        # sel_tb = '' #选中的表
-        # one_high = ''   #温度上限
-        # one_low = ''    #温度下限
         self.items = {}
         self.is_double_clicked = False
         self.sel_name = 'HE410N8115'  # 默认选择阴凉库1
         bgbruse = ''  # 保存单元格的默认笔刷
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
+
+
 
         self.set_date()
         QMessageBox.information(self,
@@ -74,7 +71,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         fileName1, filetype = QFileDialog.getOpenFileName(self,
                                                           "选取文件",
                                                           "./",
-                                                          "DB Files (*.mdb);;All Files (*)"
+                                                          "DB Files (*.mdb);;All Files (*)",
+                                                          # options=QFileDialog.DontUseNativeDialog
+
                                                           )
         # 连接数据库
         # self.__class__.conn = My_DB(fileName1)
@@ -179,12 +178,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             self.table.setItem(j, i, newitem)
 
                 j += 1
-            # self.set_color(self.table.rowCount())
-
+            self.items = {}
             self.set_items(self.table.rowCount())
+            # print(self.items)
+
             for k,v in self.items.items():
                 self.table.item(v[2] - 1, 0).setBackground(QColor(255, 0, 0))
                 self.table.item(v[2], 0).setBackground(QColor(0, 255, 0))
+            self.statusBar.showMessage(f"总共有 {len(self.items)} 处丢失数据")
         except BaseException as m:
             # print(m)
             # print(type(m))
@@ -192,6 +193,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                     "消息框标题",
                                     "请先选择一个需要查询的表",
                                     )
+
 
     # 详细修改
     @Slot()
@@ -396,8 +398,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     self.items[index] = (d,new_d,count)
                     index += 1
                 d = new_d
-        # print(self.items)
-        # return self.items
+
 
     # 执行插入数据操作
     def insert_data(self,start_date,end_date):

@@ -188,8 +188,10 @@ class My_DB(object):
     # 查询出没有数据的前一天的数据
     def myinsert(self, tb_sn, start_date, end_date):
         # timedelta用于计算日期，查询出来前一天的数据，然后把日期修改成后一天，最好写入到数据库
-        start_date = datetime.strptime(start_date,'%Y/%m/%d %H:%M:%S') - timedelta(days=2)
-        end_date = datetime.strptime(end_date,'%Y/%m/%d %H:%M:%S') - timedelta(days=2)
+        days = (datetime.strptime(end_date,'%Y/%m/%d %H:%M:%S')-datetime.strptime(start_date,'%Y/%m/%d %H:%M:%S')).days
+        print(days)
+        start_date = datetime.strptime(start_date,'%Y/%m/%d %H:%M:%S') - timedelta(days=days+1)
+        end_date = datetime.strptime(end_date,'%Y/%m/%d %H:%M:%S') - timedelta(days=days+1)
         query = QSqlQuery(self.db)
         # print(f"插入函数初始化{id(query)}")
         sql = f'''SELECT LOGS_TIME, LOGS_CHONE, LOGS_CHTWO, LOGS_CHTHREE, LOGS_CHFOUR, BAT_DC_STATE FROM {tb_sn} where LOGS_TIME > #{start_date}# AND LOGS_TIME < #{end_date}#'''

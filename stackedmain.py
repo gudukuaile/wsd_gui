@@ -11,6 +11,7 @@ class MyStacked(QDialog,Ui_Dialog):
         self.setupUi(self)
         self.treeWidget.setColumnCount(2)
         self.treeWidget.setHeaderLabels(['key', 'value'])
+        self.treeWidget.setColumnWidth(0,200)
 
         # self.pushButton.click().connect()
 
@@ -26,6 +27,7 @@ class MyStacked(QDialog,Ui_Dialog):
             item2.setText(0, d)
             item3.setText(0, new_d)
 
+        self.treeWidget.expandAll()
 
 
     @Slot()
