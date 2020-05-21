@@ -8,18 +8,19 @@ pyinstaller -Fw wmian.py打包exe程序
 import random
 import sys
 
-from PySide2.QtCore import QTimer,Slot,QDateTime,QDate
+from PySide2.QtCore import QTimer,Slot,QDateTime,QDate,Signal
 from PySide2.QtGui import QBrush,QColor
 from PySide2.QtWidgets import QMainWindow,QApplication,QFileDialog,QMessageBox,QTableWidgetItem,QHeaderView,\
     QPushButton,QAbstractButton,QAbstractItemView,QDialog
 from Ui_mainw import Ui_MainWindow
-from stacked_demo import Ui_Dialog
+from stackedmain import MyStacked
 from my_fun import My_DB
 from datetime import datetime
 
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
+
 
     def __init__(self, parent=None):
         """
@@ -33,6 +34,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # sel_tb = '' #选中的表
         # one_high = ''   #温度上限
         # one_low = ''    #温度下限
+        self.items = {}
         self.is_double_clicked = False
         self.sel_name = 'HE410N8115'  # 默认选择阴凉库1
         bgbruse = ''  # 保存单元格的默认笔刷
@@ -177,7 +179,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             self.table.setItem(j, i, newitem)
 
                 j += 1
-            self.set_color(self.table.rowCount())
+            # self.set_color(self.table.rowCount())
+
+            self.set_items(self.table.rowCount())
+            for k,v in self.items.items():
+                self.table.item(v[2] - 1, 0).setBackground(QColor(255, 0, 0))
+                self.table.item(v[2], 0).setBackground(QColor(0, 255, 0))
         except BaseException as m:
             # print(m)
             # print(type(m))
@@ -221,10 +228,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     @Slot()
     def on_ins_tb_clicked(self):
 
-        d = QDialog()
-        aa = Ui_Dialog()
-        aa.setupUi(d)
-        d.exec_()
+        self.create_tree(self.items)
 
         # start_date,end_date = self.get_date()
         # q_list = self.conn.ins_tb(start_date, end_date)
@@ -270,9 +274,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if not self.is_double_clicked:
             # print('单击')
             self.sel_name = self.table.item(self.table.currentRow(), 0).text()
+            name = self.table.item(self.table.currentRow(), 1).text()
             # print(self.sel_name)
             if self.sel_name in self.conn.tb_name.keys():
-                self.label.setText(self.sel_name)
+                self.label.setText(self.sel_name+name)
                 # 获取温度上限
                 self.one_high = float(self.conn.tb_name[self.sel_name][1])
                 # 获取温度下限
@@ -372,11 +377,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                 f"{start_date}到{end_date}之间的数据{mess}完毕！",
                                 )
 
-    # 设置缺失时间的颜色,count总共的行数
-    def set_color(self,counts):
-
+    # 获取丢失数据的行数,count总共的行数
+    def set_items(self,counts):
+        index = 1
         for count in range(counts):
-            print(self.table.item(count,0).text())
+            # print(self.table.item(count,0).text())
             if count == 0:
                 d = self.table.item(0,0).text()
                 d = datetime.strptime(d,'%Y/%m/%d %H:%M:%S')
@@ -385,19 +390,36 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 new_d = self.table.item(count,0).text()
                 new_d = datetime.strptime(new_d, '%Y/%m/%d %H:%M:%S')
                 s = (new_d-d).seconds
-                d = new_d
+                # print(d,new_d)
                 # 时间差大于30分钟
                 if s > 1800:
-                    self.table.item(count-1,0).setBackground(QColor(255,0,0))
-                    self.table.item(count,0).setBackground(QColor(0,255,0))
+                    self.items[index] = (d,new_d,count)
+                    index += 1
+                d = new_d
+        # print(self.items)
+        # return self.items
 
-
+    # 执行插入数据操作
+    def insert_data(self,start_date,end_date):
+        print(f"主窗口{start_date},{end_date}")
+        self.conn.ins_tb(start_date,end_date)
+    def create_tree(self,items):
+        stacked = MyStacked(items)
+        stacked.Signal_OneParameter.connect(self.insert_data)
+        stacked.exec_()
 def main():
     app = QApplication(sys.argv)
     m = MainWindow()
     m.show()
     sys.exit(app.exec_())
 
+# def main():
+#     app = QApplication()
+#     d = QDialog()
+#     aa = Ui_Dialog()
+#     aa.setupUi(d,items)
+#     d.show()
+#     sys.exit(app.exec_())
 
 if __name__ == '__main__':
     main()

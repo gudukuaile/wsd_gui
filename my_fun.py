@@ -171,7 +171,7 @@ class My_DB(object):
                                     '''
             query.exec_(sql)
         #     q_list.append(query)
-            # print(sql)
+        #     print(sql)
         # return q_list
 
 
@@ -188,18 +188,15 @@ class My_DB(object):
     # 查询出没有数据的前一天的数据
     def myinsert(self, tb_sn, start_date, end_date):
         # timedelta用于计算日期，查询出来前一天的数据，然后把日期修改成后一天，最好写入到数据库
-        start_date = datetime.strptime(start_date,'%Y/%m/%d %H:%M:%S') - timedelta(days=1)
-        end_date = datetime.strptime(end_date,'%Y/%m/%d %H:%M:%S') - timedelta(days=1)
+        start_date = datetime.strptime(start_date,'%Y/%m/%d %H:%M:%S') - timedelta(days=2)
+        end_date = datetime.strptime(end_date,'%Y/%m/%d %H:%M:%S') - timedelta(days=2)
         query = QSqlQuery(self.db)
         # print(f"插入函数初始化{id(query)}")
         sql = f'''SELECT LOGS_TIME, LOGS_CHONE, LOGS_CHTWO, LOGS_CHTHREE, LOGS_CHFOUR, BAT_DC_STATE FROM {tb_sn} where LOGS_TIME > #{start_date}# AND LOGS_TIME < #{end_date}#'''
         
-        # print(sql)
+        print(sql)
         query.exec_(sql)
 
-        # print(f"插入函数执行查询后{id(query)}")
-
-        # print(sql)
         while query.next():
             # print('开始插入')
             # print(query.value(0))
@@ -209,7 +206,7 @@ class My_DB(object):
                         VALUES(#{LOGS_TIME}#,{query.value('LOGS_CHONE')},{query.value('LOGS_CHTWO')},{query.value('LOGS_CHTHREE')},{query.value('LOGS_CHFOUR')},{query.value('BAT_DC_STATE')})'''
 
             # 把数据的日期加一天，insert数据
-            # print(sql)
+            print(sql)
             q.exec_(sql)
         print('数据写入完毕！')
             # print(query.exec_(sql))

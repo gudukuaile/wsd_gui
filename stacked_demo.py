@@ -20,7 +20,7 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         if not Dialog.objectName():
             Dialog.setObjectName(u"Dialog")
-        Dialog.resize(554, 487)
+        Dialog.resize(600, 450)
         self.horizontalLayout = QHBoxLayout(Dialog)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.stackedWidget = QStackedWidget(Dialog)
@@ -32,12 +32,9 @@ class Ui_Dialog(object):
         self.horizontalLayout_3 = QHBoxLayout()
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
         self.treeWidget = QTreeWidget(self.page)
-        __qtreewidgetitem = QTreeWidgetItem(self.treeWidget)
-        QTreeWidgetItem(__qtreewidgetitem)
-        QTreeWidgetItem(__qtreewidgetitem)
-        __qtreewidgetitem1 = QTreeWidgetItem(self.treeWidget)
-        QTreeWidgetItem(__qtreewidgetitem1)
-        QTreeWidgetItem(__qtreewidgetitem1)
+        __qtreewidgetitem = QTreeWidgetItem()
+        __qtreewidgetitem.setText(0, u"1");
+        self.treeWidget.setHeaderItem(__qtreewidgetitem)
         self.treeWidget.setObjectName(u"treeWidget")
 
         self.horizontalLayout_3.addWidget(self.treeWidget)
@@ -116,28 +113,6 @@ class Ui_Dialog(object):
 
     def retranslateUi(self, Dialog):
         Dialog.setWindowTitle(QCoreApplication.translate("Dialog", u"Dialog", None))
-        ___qtreewidgetitem = self.treeWidget.headerItem()
-        ___qtreewidgetitem.setText(1, QCoreApplication.translate("Dialog", u"value", None));
-        ___qtreewidgetitem.setText(0, QCoreApplication.translate("Dialog", u"key", None));
-
-        __sortingEnabled = self.treeWidget.isSortingEnabled()
-        self.treeWidget.setSortingEnabled(False)
-        ___qtreewidgetitem1 = self.treeWidget.topLevelItem(0)
-        ___qtreewidgetitem1.setText(1, QCoreApplication.translate("Dialog", u"a", None));
-        ___qtreewidgetitem1.setText(0, QCoreApplication.translate("Dialog", u"\u9879\u76ee1", None));
-        ___qtreewidgetitem2 = ___qtreewidgetitem1.child(0)
-        ___qtreewidgetitem2.setText(0, QCoreApplication.translate("Dialog", u"1", None));
-        ___qtreewidgetitem3 = ___qtreewidgetitem1.child(1)
-        ___qtreewidgetitem3.setText(0, QCoreApplication.translate("Dialog", u"2", None));
-        ___qtreewidgetitem4 = self.treeWidget.topLevelItem(1)
-        ___qtreewidgetitem4.setText(1, QCoreApplication.translate("Dialog", u"b", None));
-        ___qtreewidgetitem4.setText(0, QCoreApplication.translate("Dialog", u"\u9879\u76ee2", None));
-        ___qtreewidgetitem5 = ___qtreewidgetitem4.child(0)
-        ___qtreewidgetitem5.setText(0, QCoreApplication.translate("Dialog", u"cc", None));
-        ___qtreewidgetitem6 = ___qtreewidgetitem4.child(1)
-        ___qtreewidgetitem6.setText(0, QCoreApplication.translate("Dialog", u"ff", None));
-        self.treeWidget.setSortingEnabled(__sortingEnabled)
-
         self.label.setText(QCoreApplication.translate("Dialog", u"\u5f00\u59cb\u65f6\u95f4", None))
         self.dateTimeEdit.setDisplayFormat(QCoreApplication.translate("Dialog", u"yyyy/M/d H:mm:ss", None))
         self.label_2.setText(QCoreApplication.translate("Dialog", u"\u7ed3\u675f\u65f6\u95f4", None))
