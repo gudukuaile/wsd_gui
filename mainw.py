@@ -29,7 +29,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         @param parent reference to the parent widget
         @type QWidget
         """
-        self.items = {}
+        # self.items = {}
         self.is_double_clicked = False
         self.sel_name = 'HE410N8115'  # 默认选择阴凉库1
         bgbruse = ''  # 保存单元格的默认笔刷
@@ -150,8 +150,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         try:
             query = self.conn.show_data(self.sel_name,start_date,end_date)
 
+            # j表示行数，i表示列数，d表示
             j = 0
-            d = 0
             while query.next():
                 # 当数据大于默认的行数时，在最后一行加入一个空行
                 if j >= self.table.rowCount():
@@ -232,8 +232,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.create_tree(self.items)
 
-        # start_date,end_date = self.get_date()
-        # q_list = self.conn.ins_tb(start_date, end_date)
 
 
     # 退出
@@ -288,10 +286,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.two_low = float(self.conn.tb_name[self.sel_name][4])
             else:
                 self.sel_name = 'HE410N8115'
-                QMessageBox.information(self,
-                                        "消息框标题",
-                                        "操作有误，请重新选择需要修改数据的表！",
-                                        )
+                # QMessageBox.information(self,
+                #                         "消息框标题",
+                #                         "操作有误，请重新选择需要修改数据的表！",
+                #                         )
         else:
             self.is_double_clicked = False
 
@@ -414,13 +412,6 @@ def main():
     m.show()
     sys.exit(app.exec_())
 
-# def main():
-#     app = QApplication()
-#     d = QDialog()
-#     aa = Ui_Dialog()
-#     aa.setupUi(d,items)
-#     d.show()
-#     sys.exit(app.exec_())
 
 if __name__ == '__main__':
     main()

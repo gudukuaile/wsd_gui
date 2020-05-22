@@ -1,4 +1,5 @@
 from PySide2.QtCore import *
+from PySide2.QtGui import QColor
 from PySide2.QtWidgets import *
 from stacked_demo import Ui_Dialog
 from my_fun import My_DB
@@ -20,6 +21,7 @@ class MyStacked(QDialog,Ui_Dialog):
             d = v[0].strftime('%Y/%m/%d %H:%M:%S')
             new_d = v[1].strftime('%Y/%m/%d %H:%M:%S')
             item = QTreeWidgetItem(self.treeWidget)
+            item.setBackgroundColor(0,QColor(127,255,212))
             item.setText(0, str(k))
             item.setText(1, str(v[2]))
             item2 = QTreeWidgetItem(item)
@@ -32,6 +34,7 @@ class MyStacked(QDialog,Ui_Dialog):
 
     @Slot()
     def on_treeWidget_clicked(self):
+        self.aa = self.treeWidget.currentItem()
         citem = self.treeWidget.currentItem()
         self.start_date = citem.child(0).text(0)
         self.end_date = citem.child(1).text(0)
@@ -43,6 +46,9 @@ class MyStacked(QDialog,Ui_Dialog):
 
     @Slot()
     def on_pushButton_clicked(self):
+
+        index = self.treeWidget.indexOfTopLevelItem(self.aa)
+        self.treeWidget.takeTopLevelItem(index)
         # print(self.start_date)
         # print(self.end_date)
         # My_DB.ins_tb(start_date=self.start_date,end_date=self.end_date)
