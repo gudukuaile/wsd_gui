@@ -17,6 +17,7 @@ from datetime import timedelta,datetime
 class My_DB(object):
 
     def __init__(self, db_path):
+        
         self.tb_name = {}
         self.db = ''
         # 连接数据库
@@ -190,19 +191,28 @@ class My_DB(object):
         # timedelta用于计算日期，查询出来前一天的数据，然后把日期修改成后一天，最好写入到数据库
         days = (datetime.strptime(end_date,'%Y/%m/%d %H:%M:%S')-datetime.strptime(start_date,'%Y/%m/%d %H:%M:%S')).days
         print(days)
-        start_date = datetime.strptime(start_date,'%Y/%m/%d %H:%M:%S') - timedelta(days=days+1)
-        end_date = datetime.strptime(end_date,'%Y/%m/%d %H:%M:%S') - timedelta(days=days+1)
+        print(start_date,end_date)
+        if days == 0:
+            start_date = datetime.strptime(start_date,'%Y/%m/%d %H:%M:%S') - timedelta(days=1)
+            end_date = datetime.strptime(end_date,'%Y/%m/%d %H:%M:%S') - timedelta(days=1)
+        else:
+            start_date = datetime.strptime(start_date, '%Y/%m/%d %H:%M:%S') - timedelta(days=days)
+            end_date = datetime.strptime(end_date, '%Y/%m/%d %H:%M:%S') - timedelta(days=days)
         query = QSqlQuery(self.db)
         # print(f"插入函数初始化{id(query)}")
         sql = f'''SELECT LOGS_TIME, LOGS_CHONE, LOGS_CHTWO, LOGS_CHTHREE, LOGS_CHFOUR, BAT_DC_STATE FROM {tb_sn} where LOGS_TIME > #{start_date}# AND LOGS_TIME < #{end_date}#'''
-        
-        print(sql)
+
+        print(start_date,end_date)
+        # print(sql)
         query.exec_(sql)
 
         while query.next():
             # print('开始插入')
             # print(query.value(0))
-            LOGS_TIME = query.value('LOGS_TIME').toPython() + timedelta(days=1)
+            if days == 0:
+                LOGS_TIME = query.value('LOGS_TIME').toPython() + timedelta(days=days+1)
+            else:
+                LOGS_TIME = query.value('LOGS_TIME').toPython() + timedelta(days=days)
             q = QSqlQuery()
             sql = f'''INSERT INTO {tb_sn} (LOGS_TIME, LOGS_CHONE, LOGS_CHTWO, LOGS_CHTHREE, LOGS_CHFOUR, BAT_DC_STATE)
                         VALUES(#{LOGS_TIME}#,{query.value('LOGS_CHONE')},{query.value('LOGS_CHTWO')},{query.value('LOGS_CHTHREE')},{query.value('LOGS_CHFOUR')},{query.value('BAT_DC_STATE')})'''
