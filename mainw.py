@@ -7,16 +7,21 @@ pyinstaller -Fw wmian.py打包exe程序
 """
 import random
 import sys
-
+import numpy as np
 from PySide2.QtCore import QTimer,Slot,QDateTime,QDate,Signal
 from PySide2.QtGui import QBrush,QColor
-from PySide2.QtWidgets import QMainWindow,QApplication,QFileDialog,QMessageBox,QTableWidgetItem,QHeaderView,\
-    QPushButton,QAbstractButton,QAbstractItemView,QDialog
+from PySide2.QtWidgets import QMainWindow, QApplication, QFileDialog, QMessageBox, QTableWidgetItem, QHeaderView, \
+    QPushButton, QAbstractButton, QAbstractItemView, QDialog, QSizePolicy
 from Ui_mainw import Ui_MainWindow
 from stackedmain import MyStacked
 from my_fun import My_DB
 from datetime import datetime
 
+from matplotlib.backends.backend_qt5agg import (
+    FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
+
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -35,6 +40,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         bgbruse = ''  # 保存单元格的默认笔刷
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
+
+        # 显示画图
+        # static_canvas = FigureCanvas(Figure(figsize=(5, 3)))
+        # self.addToolBar(NavigationToolbar(static_canvas, self))
+        # self.horizontalLayout.addWidget(static_canvas)
+
+
+        # self._static_ax = static_canvas.figure.subplots()
+
+
 
 
 
@@ -70,13 +85,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def on_conn_clicked(self):
         fileName1, filetype = QFileDialog.getOpenFileName(self,
                                                           "选取文件",
-                                                          "./",
+                                                          "",
                                                           "DB Files (*.mdb);;All Files (*)",
                                                           # options=QFileDialog.DontUseNativeDialog
 
                                                           )
         # 连接数据库
         # self.__class__.conn = My_DB(fileName1)
+        print(fileName1)
         self.conn = My_DB(fileName1)
         # print(fileName1)
         self.set_table()
@@ -179,8 +195,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
                 j += 1
             self.items = {}
+            # 获取总行数
             self.set_items(self.table.rowCount())
-            # print(self.items)
+            d = []
+            wendu = []
+            shidu = []
+            for c in range(self.table.rowCount()):
+                # print(self.table.item(c,0).text())
+                d.append(self.table.item(c,0).text())
+                wendu.append(self.table.item(c,1).text())
+                shidu.append(self.table.item(c,2).text())
+            # self._static_ax.plot(d,wendu)
+            # self._static_ax.plot(d,shidu)
+            # plt.xticks(rotation=45)
+            # plt.plot(d,[30]*len(wendu))
+            # plt.plot(d,[10]*len(wendu))
+            # plt.plot(d, wendu)
+            # # plt.plot(d, shidu)
+            # plt.show()
+
 
             for k,v in self.items.items():
                 self.table.item(v[2] - 1, 0).setBackground(QColor(255, 0, 0))
@@ -383,12 +416,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 new_d = self.table.item(count,0).text()
                 new_d = datetime.strptime(new_d, '%Y/%m/%d %H:%M:%S')
                 s = (new_d-d).seconds
+                ds = (new_d-d).days
                 # print(d,new_d)
                 # 时间差大于30分钟
-                if s > 1800:
+                if s > 1800 or ds >= 1:
                     self.items[index] = (d,new_d,count)
                     index += 1
                 d = new_d
+        # print(self.items)
 
     # 退出
     @Slot()
@@ -403,7 +438,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def insert_data(self,start_date,end_date):
         print(f"主窗口{start_date},{end_date}")
         self.conn.ins_tb(start_date,end_date)
+<<<<<<< HEAD
     
+=======
+        
+>>>>>>> 391b2e85dd55f4509ca3e5a6f85fa085b7861a68
     def create_tree(self,items):
         stacked = MyStacked(items)
         stacked.Signal_OneParameter.connect(self.insert_data)
