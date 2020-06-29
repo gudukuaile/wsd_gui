@@ -41,10 +41,9 @@ class My_DB(object):
     # 显示表
     def select_table(self):
         query = QSqlQuery(self.db)
-        sql = (r'''SELECT LOGGER_SN, LOGGER_NAME,  CHONE_HIGH , CHONE_LOW,  CHTWO_HIGH, CHTWO_LOW 
+        sql = f'''SELECT LOGGER_SN, LOGGER_NAME,  CHONE_HIGH , CHONE_LOW,  CHTWO_HIGH, CHTWO_LOW 
                     FROM TO_LOGGER_INFO 
-                    where LOGGER_SN in %s ORDER BY CHONE_HIGH,LOGGER_NAME '''
-               % (str(tuple(self.tb_name.keys()))))
+                    where LOGGER_SN in {str(tuple(self.tb_name.keys()))} ORDER BY CHONE_HIGH,LOGGER_NAME '''
         query.exec_(sql)
         # print('显示表' + sql)
         # print(str(tuple(self.tb_name.keys())))
@@ -57,11 +56,6 @@ class My_DB(object):
         for key in self.tb_name.keys():
             # 不修改保温箱跟冷藏车的记录
             tb_sn = 'LOGS_' + key
-            # del_sql = (r'''delete from %s
-            #                             where  LOGS_TIME not in
-            #                             (SELECT LOGS_TIME FROM %s where LOGS_TIME LIKE '%%:[03]0:00') and LOGS_TIME like '%s%%'
-            #                         '''
-            #            % (tb_sn, tb_sn, date))
             del_sql = f'''delete  FROM {tb_sn} where (LOGS_TIME LIKE '%:[!03][0-9]:00' OR LOGS_TIME LIKE '%:[03][1-9]:00')
                                             AND LOGS_TIME NOT LIKE '2019/7/3 %' and LOGS_TIME NOT LIKE '2020/4/21 %'
                                         '''
@@ -117,44 +111,44 @@ class My_DB(object):
             # # 修改成功后删除修改过的库
             # self.tb_name.pop(self.sel_name)
 
-    # 显示超标数据
+    # 显示指定时间段内的所有数据
     def show_data(self, SN, start_date,end_date):
         tb_sn = 'LOGS_' + SN
         query = QSqlQuery(self.db)
 
-        # sql = f'''SELECT LOGS_TIME, LOGS_CHONE, LOGS_CHTWO 
-        #                     FROM {tb_sn} 
-        #                     where  (LOGS_CHONE >= {self.tb_name[SN][1]} or LOGS_CHONE <= {self.tb_name[SN][2]} or LOGS_CHTWO>={ self.tb_name[SN][3]} or LOGS_CHTWO<={ self.tb_name[SN][4]} ) 
-        #                     and LOGS_TIME between #{start_date}# and #{end_date}#
-        #                     ORDER BY LOGS_TIME
-        #                 '''
+        sql = f'''SELECT LOGS_TIME, LOGS_CHONE, LOGS_CHTWO 
+                            FROM {tb_sn} 
+                            where   LOGS_TIME between #{start_date}# and #{end_date}#
+                            order by LOGS_TIME
+                        '''
+        query.exec_(sql)
+        print('显示超标数据' + sql)
+        return query
+
+        # 查询超标数据
+    def show_errdata(self, SN, start_date,end_date,one_high,one_low,two_high,two_low):
+        tb_sn = 'LOGS_' + SN
+        query = QSqlQuery(self.db)
 
         sql = f'''SELECT LOGS_TIME, LOGS_CHONE, LOGS_CHTWO 
                             FROM {tb_sn} 
                             where   LOGS_TIME between #{start_date}# and #{end_date}#
-                            ORDER BY LOGS_TIME
+                            and (LOGS_CHONE >= {one_high} OR LOGS_CHONE <= {one_low} OR LOGS_CHTWO >= {two_high} OR LOGS_CHTWO <={two_low})
                         '''
         query.exec_(sql)
-        # print('显示超标数据' + sql)
+        print('显示超标数据' + sql)
         return query
 
     # 详细修改数据
     def up_data(self, tb, high, logs_time, x):
         query = QSqlQuery(self.db)
         if x == 'one':
-            sql = (r'''update %s set LOGS_CHONE=%s
-                        where LOGS_TIME like '%s%%'
-                    '''
-                   % (tb, high, logs_time)
-                   )
+            sql = f"update {tb} set LOGS_CHONE={high} where LOGS_TIME = #{logs_time}#"
             # print('修改详细温度：' + sql)
             query.exec_(sql)
         elif x == 'two':
-            sql = (r'''update %s set LOGS_CHTWO=%s
-                                    where LOGS_TIME like '%s%%'
-                                '''
-                   % (tb, high, logs_time)
-                   )
+            sql = f"update {tb} set LOGS_CHTWO={high} where LOGS_TIME = #{logs_time}#"
+
             # print('修改详细湿度：' + sql)
             query.exec_(sql)
 
@@ -208,7 +202,7 @@ class My_DB(object):
                         VALUES(#{LOGS_TIME}#,{query.value('LOGS_CHONE')},{query.value('LOGS_CHTWO')},{query.value('LOGS_CHTHREE')},{query.value('LOGS_CHFOUR')},{query.value('BAT_DC_STATE')})'''
 
             # 把数据的日期加一天，insert数据
-            print(sql)
+            #print(sql)
             q.exec_(sql)
         print('数据写入完毕！')
             # print(query.exec_(sql))

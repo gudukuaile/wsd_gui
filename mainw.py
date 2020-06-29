@@ -135,7 +135,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.set_table()
         self.show_table()
 
-    # 显示超标数据
+    # 显示指定时间段内的数据
     @Slot()
     def on_view_tb_clicked(self):
         self.table.clear()
@@ -195,13 +195,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                     )
 
 
-    # 详细修改
+    # 修改数据
     @Slot()
     def on_up_tb_clicked(self):
         # 按年份，月份修改
         tb = 'LOGS_' + self.sel_name
         start_date,end_date = self.get_date()
-        query = self.conn.show_data(self.sel_name, start_date, end_date)
+        query = self.conn.show_errdata(self.sel_name, start_date, end_date,self.one_high,self.one_low,self.two_high,self.two_low)
         while query.next():
             # 获取当前的实际温度
             one = query.value(1)
@@ -221,6 +221,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 else:
                     high = random.uniform(self.two_high - 1, self.two_high + 1)
                 self.conn.up_data(tb, high, query.value(0).toString('yyyy/M/d h:mm:ss'), 'two')
+
         QMessageBox.information(self,
                                 "消息框标题",
                                 "修改完毕！",
@@ -234,14 +235,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 
 
-    # 退出
-    @Slot()
-    def on_tui_clicked(self):
-        if not isinstance(self.conn, QPushButton):
-            self.conn.db.close()
-            self.close()
-        else:
-            self.close()
 
 
     # 设置表格
@@ -397,15 +390,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     index += 1
                 d = new_d
 
+    # 退出
+    @Slot()
+    def on_tui_clicked(self):
+        if not isinstance(self.conn, QPushButton):
+            self.conn.db.close()
+            self.close()
+        else:
+            self.close()
 
     # 执行插入数据操作
     def insert_data(self,start_date,end_date):
         print(f"主窗口{start_date},{end_date}")
         self.conn.ins_tb(start_date,end_date)
+    
     def create_tree(self,items):
         stacked = MyStacked(items)
         stacked.Signal_OneParameter.connect(self.insert_data)
         stacked.exec_()
+
+
 def main():
     app = QApplication(sys.argv)
     m = MainWindow()
