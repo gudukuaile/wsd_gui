@@ -8,3 +8,4 @@
 out
 gen
 .vscode
+*__pycache__*

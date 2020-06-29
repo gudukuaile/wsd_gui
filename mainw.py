@@ -438,11 +438,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def insert_data(self,start_date,end_date):
         print(f"主窗口{start_date},{end_date}")
         self.conn.ins_tb(start_date,end_date)
-<<<<<<< HEAD
-    
-=======
-        
->>>>>>> 391b2e85dd55f4509ca3e5a6f85fa085b7861a68
     def create_tree(self,items):
         stacked = MyStacked(items)
         stacked.Signal_OneParameter.connect(self.insert_data)
