@@ -7,7 +7,7 @@ pyinstaller -Fw wmian.py打包exe程序
 """
 import random
 import sys
-import numpy as np
+# import numpy as np
 from PySide2.QtCore import QTimer,Slot,QDateTime,QDate,Signal
 from PySide2.QtGui import QBrush,QColor
 from PySide2.QtWidgets import QMainWindow, QApplication, QFileDialog, QMessageBox, QTableWidgetItem, QHeaderView, \
@@ -17,11 +17,11 @@ from stackedmain import MyStacked
 from my_fun import My_DB
 from datetime import datetime
 
-from matplotlib.backends.backend_qt5agg import (
-    FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
+# from matplotlib.backends.backend_qt5agg import (
+#     FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
 
-from matplotlib.figure import Figure
-import matplotlib.pyplot as plt
+# from matplotlib.figure import Figure
+# import matplotlib.pyplot as plt
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
